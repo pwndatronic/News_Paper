@@ -49,6 +49,7 @@
 '''9. Вывести username и рейтинг лучшего пользователя (применяя сортировку и возвращая поля первого объекта).'''
 # best = Author.objects.order_by('-author_rating')[0]
 # print(f'Лучший автор: {best.author.username}, его рейтинг: {best.author_rating}.')
+# Author.objects.order_by('-author_rating').values('author__username', 'author_rating').first()
 
 '''10. Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи, основываясь на лайках/дислайках к этой статье.'''
 # best_post = Post.objects.order_by('-post_rating')[0]
@@ -57,6 +58,8 @@
 #       f'Рейтинг статьи: {best_post.post_rating};\n'
 #       f'Заголовок: {best_post.post_title}\n'
 #       f'Превью: {best_post.preview()}\n')
+
+# Post.objects.order_by('-post_rating').values('post_creation_datetime', 'author__author__username', 'post_rating', 'post_title').first()
 
 '''11. Вывести все комментарии (дата, пользователь, рейтинг, текст) к этой статье.'''
 # coms_in_best = Comment.objects.filter(comment_in_post=best_post)

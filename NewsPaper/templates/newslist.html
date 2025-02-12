@@ -1,0 +1,29 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+All News
+{% endblock title %}
+
+{% block content %}
+<h1>Все новости - {{ newslist|length }}</h1>
+<hr>
+{% if newslist %}
+    <table>
+        <tr>
+            <td>Заголовок</td>
+            <td>Дата публикации</td>
+            <td>Превью</td>
+        </tr>
+        {% for new in newslist %}
+            <tr>
+                <td>{{ new.post_title }}</td>
+                <td>{{ new.post_creation_datetime }}</td>
+<!--                <td>{{ new.preview }}</td>-->
+                <td>{{ new.post_body|truncatewords:20 }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <h3>Новостей нет.</h3>
+{% endif %}
+{% endblock content %}
