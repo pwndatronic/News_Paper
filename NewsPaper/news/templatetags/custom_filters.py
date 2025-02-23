@@ -16,10 +16,10 @@ def censor(text):
         print("Неверный тип данных. Нужен str.")
     else:
         _text = re.findall(r"[\w+]+|[.,!?;:«»/]", text)
-        for word in _text:
+        for k, word in enumerate(_text):
             if all([word[1:].islower() is False,
                     word.isdigit() is False]):
-                _text[_text.index(word)] = word[0:1] + censor_sign * (len(word) - 1)
+                _text[k] = word[0:1] + censor_sign * (len(word) - 1)
             else:
                 continue
         formated_text = re.sub(r" ([.,!?;:»/])", r"\1", " ".join(_text))
