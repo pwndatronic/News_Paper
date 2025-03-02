@@ -17,5 +17,5 @@ class NewsFilter(FilterSet):
         fields = {
             'post_title': ['icontains'],
             'author__author__username': ['icontains'],
-            # 'post_creation_datetime': [],
+            'post_creation_datetime': [],
         }

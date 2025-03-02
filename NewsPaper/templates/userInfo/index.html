@@ -1,0 +1,12 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<h3>Страница пользователя - {{ request.user.username }}</h3>
+<br>
+<form method="post" action="{% url 'account_logout' %}">
+    {% csrf_token %}
+    <input type="submit" value=" Выйти ">
+</form>
+
+{% endblock content %}

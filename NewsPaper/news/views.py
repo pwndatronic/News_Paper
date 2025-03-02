@@ -3,6 +3,9 @@ from django.urls import reverse_lazy
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import PostForm
 from .filters import NewsFilter
 from .models import Post
@@ -51,12 +54,13 @@ class NewsCreate(CreateView):
     def form_valid(self, form):
         new = form.save(commit=False)
         new.post_content = self.model.news
-        '''admin is not an instance of Author. ??'''
+        '''admin is not an instance of Author. ??
+        request.user.username'''
         # new.author = self.request.user
         return super().form_valid(form)
 
 
-class NewsUpdate(UpdateView):
+class NewsUpdate(LoginRequiredMixin, UpdateView):
     form_class = PostForm
     model = Post
     pk_url_kwarg = 'id'
@@ -81,6 +85,7 @@ class ArticleCreate(CreateView):
         return super().form_valid(form)
 
 
+@method_decorator(login_required, name='dispatch')
 class ArticleUpdate(UpdateView):
     form_class = PostForm
     model = Post
