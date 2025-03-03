@@ -5,7 +5,7 @@ from django.views.generic import (
 )
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from .forms import PostForm
 from .filters import NewsFilter
 from .models import Post
@@ -46,9 +46,10 @@ class PostDetail(DetailView):
     context_object_name = 'post_detail'
 
 
-class NewsCreate(CreateView):
+class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     form_class = PostForm
     model = Post
+    permission_required = 'news.add_post'
     template_name = 'post_edit.html'
 
     def form_valid(self, form):
@@ -60,23 +61,26 @@ class NewsCreate(CreateView):
         return super().form_valid(form)
 
 
-class NewsUpdate(LoginRequiredMixin, UpdateView):
+class NewsUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     form_class = PostForm
     model = Post
+    permission_required = 'news.change_post'
     pk_url_kwarg = 'id'
     template_name = 'post_edit.html'
 
 
-class NewsDelete(DeleteView):
+class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Post
     pk_url_kwarg = 'id'
     template_name = 'post_delete.html'
+    permission_required = 'news.delete_post'
     success_url = reverse_lazy('news_list')
 
 
-class ArticleCreate(CreateView):
+class ArticleCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     form_class = PostForm
     model = Post
+    permission_required = 'news.add_post'
     template_name = 'post_edit.html'
 
     def form_valid(self, form):
@@ -86,15 +90,17 @@ class ArticleCreate(CreateView):
 
 
 @method_decorator(login_required, name='dispatch')
-class ArticleUpdate(UpdateView):
+class ArticleUpdate(PermissionRequiredMixin, UpdateView):
     form_class = PostForm
     model = Post
+    permission_required = 'news.delete_post'
     pk_url_kwarg = 'id'
     template_name = 'post_edit.html'
 
 
-class ArticleDelete(DeleteView):
+class ArticleDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Post
     pk_url_kwarg = 'id'
+    permission_required = 'news.delete_post'
     template_name = 'post_delete.html'
     success_url = reverse_lazy('news_list')
