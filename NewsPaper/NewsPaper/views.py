@@ -10,3 +10,9 @@ def become_author(request):
     if not request.user.groups.filter(name='Author').exists():
         author_group.user_set.add(user)
     return redirect('/')
+
+
+# @login_required()
+# def become_subscriber(request):
+#     user = request.user
+#     categories = Post.objects.filter(categorie=)

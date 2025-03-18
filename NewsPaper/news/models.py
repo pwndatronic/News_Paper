@@ -31,6 +31,18 @@ class Author(models.Model):
 
 class Category(models.Model):
     category_name = models.CharField(max_length=100, unique=True)
+    subscribers = models.ManyToManyField(User,
+                                         through='CategorySubscribers',
+                                         related_name='subscribed_categories',
+                                         blank=True)
+
+    def __str__(self):
+        return self.category_name
+
+
+class CategorySubscribers(models.Model):
+    subscriber = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.ForeignKey('Category', on_delete=models.CASCADE)
 
 
 class Post(models.Model):
@@ -56,7 +68,7 @@ class Post(models.Model):
         return self.post_body[:124] + '...' if len(self.post_body) > 124 else self.post_body
 
     def get_absolute_url(self):
-        return reverse('news_detail', args=[str(self.id)])
+        return reverse('post_detail', args=[str(self.id)])
 
     def like(self):
         self.post_rating += 1

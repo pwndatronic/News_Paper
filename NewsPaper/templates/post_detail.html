@@ -14,6 +14,11 @@
 
 {% if post_detail.post_body %}
     {{ post_detail.post_body|censor }}
+    <hr>
+    <form method="post" action="{% url 'subscribe' post_detail.id %}">
+        {% csrf_token %}
+        <button type="submit">Подписаться</button>
+    </form>
 {% else %}
     <hr5>Злые смурфы украли новость у читателей!</hr5>
 {% endif %}

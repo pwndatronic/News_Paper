@@ -1,5 +1,8 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404, redirect
+from django.core.mail import EmailMultiAlternatives, send_mail
+from django.template.loader import render_to_string
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
@@ -8,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from .forms import PostForm
 from .filters import NewsFilter
-from .models import Post
+from .models import Post, User, Author
 
 '''Создать PostList, NewsList @ ArticleList от него.'''
 
@@ -45,6 +48,23 @@ class PostDetail(DetailView):
     pk_url_kwarg = 'id'
     context_object_name = 'post_detail'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = self.get_object()
+        context['categories'] = post.postcategory_set.select_related('category')
+        return context
+
+
+@login_required()
+def subscribe_to_categories(request, post_id):
+    user = request.user
+    post = get_object_or_404(Post, id=post_id)
+    categories = post.categories.all()
+    for category in categories:
+        if not category.subscribers.filter(id=user.id).exists():
+            category.subscribers.add(user)
+    return redirect('/')
+
 
 class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     form_class = PostForm
@@ -55,10 +75,31 @@ class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     def form_valid(self, form):
         new = form.save(commit=False)
         new.post_content = self.model.news
-        '''admin is not an instance of Author. ??
-        request.user.username'''
-        # new.author = self.request.user
-        return super().form_valid(form)
+        new.author = get_object_or_404(Author, author=self.request.user)
+        new.save()
+        super().form_valid(form)
+        return self.send_to_subcribers(new)
+
+    def send_to_subcribers(self, new):
+        categories = new.categories.all()
+        subscribers = User.objects.filter(subscribed_categories__in=categories).distinct()
+        for subscriber in subscribers:
+            html_content = render_to_string(
+                'subscription_info.html',
+                {'new': new, 'subscriber': subscriber}
+            )
+            msg = EmailMultiAlternatives(
+                subject=f'Здравствуй, {subscriber.username}. Новая статья в твоём любимом разделе!',
+                body='',
+                from_email='pwndatronic@yandex.ru',
+                to=[subscriber.email]
+            )
+            msg.attach_alternative(html_content, 'text/html')
+            try:
+                msg.send(fail_silently=False)
+            except Exception as e:
+                print(f'Ошибка: {e}')
+        return redirect('/')
 
 
 class NewsUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
@@ -67,6 +108,7 @@ class NewsUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     permission_required = 'news.change_post'
     pk_url_kwarg = 'id'
     template_name = 'post_edit.html'
+    success_url = reverse_lazy('news_list')
 
 
 class NewsDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):

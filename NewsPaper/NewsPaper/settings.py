@@ -156,3 +156,11 @@ ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_FORMS = {'signup': 'NewsPaper.forms.CustomSignupForm'}
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'pwndatronic'
+EMAIL_HOST_PASSWORD = 'pbicrgdwwpczgiiz'
+EMAIL_USE_SSL = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
