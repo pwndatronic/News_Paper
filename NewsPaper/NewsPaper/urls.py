@@ -21,7 +21,6 @@ from .views import become_author
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('userInfo.urls')),
-    # path('sign/'),
     path('pages/', include('django.contrib.flatpages.urls')),
     path('news/', include('news.urls')),
     path('accounts/', include('allauth.urls')),

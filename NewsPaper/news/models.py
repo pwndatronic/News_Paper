@@ -62,7 +62,7 @@ class Post(models.Model):
     post_creation_datetime = models.DateTimeField(auto_now_add=True)
 
     author = models.ForeignKey('Author', on_delete=models.CASCADE)
-    categories = models.ManyToManyField(Category, through='PostCategory')
+    categories = models.ManyToManyField(Category, through='PostCategory', related_name='posts_categories')
 
     def preview(self):
         return self.post_body[:124] + '...' if len(self.post_body) > 124 else self.post_body
