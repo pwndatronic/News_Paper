@@ -3,7 +3,7 @@ from django.dispatch import receiver
 
 from .models import Post
 from django.contrib.auth.models import User
-from django.core.mail import EmailMultiAlternatives, send_mail
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
 

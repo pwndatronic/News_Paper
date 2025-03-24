@@ -10,6 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from .forms import PostForm
 from .filters import NewsFilter
 from .models import Post, Author
+from .tasks import send_to_subscribers
 
 '''Создать PostList, NewsList @ ArticleList от него.'''
 
@@ -80,6 +81,7 @@ class NewsCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
             return redirect('/')
         new.save()
         form.save_m2m()
+        send_to_subscribers.delay(new.id)
         return super().form_valid(form)
 
 
